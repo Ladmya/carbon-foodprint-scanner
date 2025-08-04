@@ -1,0 +1,15 @@
+# pyproject.toml (at project root)
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools-scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "carbon_foodprint"
+version = "0.1.0"
+description = "Food barcode scanner Telegram bot"
+requires-python = ">=3.8"
+
+[tool.setuptools.packages.find]
+where = ["."]
+# List all directory files here
+include = ["*"]

@@ -1,0 +1,51 @@
+# Carbon Foodprint Scanner - Data Operations
+
+.PHONY: collect analyze reports test-extraction clean-data analyze-raw setup-data help
+
+# Data collection
+collect:
+	@echo "📥 Starting complete extraction pipeline..."
+	python data_engineering/scripts/collection/complete_extraction_pipeline.py
+
+# Data analysis
+analyze:
+	@echo "📊 Running data quality analysis..."
+	python data_engineering/scripts/analysis/analyze_raw_data_quality.py
+
+# Production reports
+reports:
+	@echo "📋 Generating production reports..."
+	python data_engineering/scripts/collection/generate_production_reports.py
+
+# Raw data quality analysis
+analyze-raw:
+	@echo "🔍 Analyzing raw data quality..."
+	python data_engineering/scripts/analysis/analyze_raw_data_quality.py
+
+# Setup data structure
+setup-data:
+	@echo "📁 Setting up data structure..."
+	python data_engineering/scripts/setup/set_up.py
+
+# Component testing
+test-extraction:
+	@echo "🔍 Testing extraction component independently..."
+	python data_engineering/scripts/setup/validate_complete_pipeline.py
+
+# Data maintenance
+clean-data:
+	@echo "🧹 Cleaning data cache..."
+	rm -rf data_engineering/data/cache/*
+	rm -rf data_engineering/data/processed/rejected/*
+
+# Help
+help:
+	@echo "Data Operations Commands:"
+	@echo "  collect         - Run data collection pipeline"
+	@echo "  analyze         - Run data quality analysis"
+	@echo "  analyze-raw     - Analyze raw data quality specifically"
+	@echo "  reports         - Generate production reports"
+	@echo "  test-extraction - Test extraction component independently"
+	@echo "  setup-data      - Setup data structure and directories"
+	@echo "  clean-data      - Clean data cache and temporary files"
+	@echo "  help            - Show this help" 

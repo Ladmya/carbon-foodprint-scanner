@@ -1,0 +1,77 @@
+🍫 *Welcome to Carbon Foodprint Scanner!*
+
+📱 *How to use the bot:*
+• Take a photo of a product barcode
+• Or type the barcode numbers directly
+• Get instant CO₂ impact + transport equivalents!
+
+🏭 *Available chocolate brands (76):*
+• Alter Eco
+• Bounty
+• Carambar
+• Carambar Michoko
+• Cémoi
+• Cémoi Pupier
+• Côte D'or Kraft Foods
+• Côte Dor Kraft Foods
+• Côte Dor Mondelèz International
+• Côte Dor Mondelēz
+• Côte d'Or
+• Ferrero
+• Ferrero Rocher
+• Isaura
+• Jeff De Bruges
+• Kinder
+• Kit Kat
+• Kraft Foods Cote Dor Mondelez
+• Leonidas
+• Lindt
+• Lindt & Sprüngli
+• Lindt & Sprüngli Nordic
+• Lindt Excellence
+• Lindt Lindor
+• Lindt Lindt &AMP Sprüngli Lindor
+• Lindt Swiss Classic
+• Lion Nestlé
+• M&Ms
+• Mars
+• Milka
+• Nestle Lion
+• Nestlé Crunch
+• Nestlé Crunch Blanc Crunch
+• Nestlé Crunch Top Crunch
+• Nestlé Lion
+• Nestlé Lion 
+• Nestlé Lion Pop Choc 
+• Nestlé Smarties
+• Nutella
+• Nutella Ferrero Mixte Nutella B-ready
+• Nutella Ferrero Nutella B-ready
+• Oreo
+• Oreo Mondelez Ginbis
+• Poulain
+• Poulain 1848
+• Poulain Cadbury France 1848
+• Poulain Fine Gourmande
+• Poulain Kraft Foods Mondelèz International
+• Poulain Lait Caramel
+• Poulain Mondelez International
+• Poulain Mondelez Unilever
+• Ritter Ritter Sport
+• Ritter Sport
+• Ritter Sport Ritter
+• Ritter Sport Ritter Sport Bunte Vielfalt
+• Ritter Sport Ritter Sport Frühlings-spezialität
+• Ritter Sport Ritter Sport Kakaoklasse
+• Ritter Sport Ritter Sport Nussklasse Rittersport
+• Ritter Sport Ritter Sport Winter-kreation
+• Ritter Sport Rittersport
+
+🌍 *What you'll get:*
+• Product name and brand
+• Nutri-Score health rating
+• CO₂ emissions per 100g and total
+• Equivalent distances (car, train, bus, plane)
+• Environmental impact level
+
+💡 *Help reduce your carbon footprint - one chocolate at a time!*

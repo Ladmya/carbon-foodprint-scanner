@@ -1,0 +1,49 @@
+# Carbon Foodprint Scanner - Development & Testing
+
+.PHONY: setup setup-complete test test-unit test-integration clean generate-readmes help
+
+# Setup and validation
+setup:
+	@echo "🔧 Validating environment..."
+	python data_engineering/scripts/setup/validate_environment.py
+
+setup-complete:
+	@echo "🔧 Validating complete pipeline..."
+	python data_engineering/scripts/setup/validate_complete_pipeline.py
+
+# Testing
+test:
+	@echo "🧪 Running all tests..."
+	python -m pytest tests/ -v
+
+test-unit:
+	@echo "🧪 Running unit tests..."
+	python -m pytest tests/unit/ -v
+
+test-integration:
+	@echo "🧪 Running integration tests..."
+	python -m pytest tests/integration/ -v
+
+# Development maintenance
+clean:
+	@echo "🧹 Cleaning temporary files..."
+	find . -type f -name "*.pyc" -delete
+	find . -type d -name "__pycache__" -delete
+	find . -type d -name ".pytest_cache" -exec rm -rf {} +
+
+# Documentation
+generate-readmes:
+	@echo "📚 Generating folder README files..."
+	python tools/generate_readme.py
+
+# Help
+help:
+	@echo "Development Commands:"
+	@echo "  setup          - Validate environment"
+	@echo "  setup-complete - Validate complete pipeline"
+	@echo "  test           - Run all tests"
+	@echo "  test-unit      - Run unit tests only"
+	@echo "  test-integration - Run integration tests only"
+	@echo "  clean          - Clean temporary files"
+	@echo "  generate-readmes - Generate folder README files from docstrings"
+	@echo "  help           - Show this help" 

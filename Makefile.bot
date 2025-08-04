@@ -1,0 +1,26 @@
+# Carbon Foodprint Scanner - Bot Operations
+
+.PHONY: run-bot test-bot deploy-bot help
+
+# Bot execution
+run-bot:
+	@echo "🤖 Starting Telegram bot..."
+	python src/food_scanner/bot/run_telegram_bot.py
+
+# Bot testing
+test-bot:
+	@echo "🧪 Testing bot functionality..."
+	python src/food_scanner/bot/barcode_scanner.py
+
+# Bot deployment (future)
+deploy-bot:
+	@echo "🚀 Deploying bot to production..."
+	@echo "⚠️  Not implemented yet - use run-bot for development"
+
+# Help
+help:
+	@echo "Bot Operations Commands:"
+	@echo "  run-bot        - Start Telegram bot"
+	@echo "  test-bot       - Test bot functionality"
+	@echo "  deploy-bot     - Deploy bot to production (future)"
+	@echo "  help           - Show this help" 

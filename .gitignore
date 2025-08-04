@@ -1,0 +1,95 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+carbon_foodprint-venv/
+venv/
+ENV/
+env/
+
+# Environment Variables
+.env
+.env.local
+.env.prod
+
+# Data files (keep structure, ignore content)
+data_engineering/data/raw/*/
+data_engineering/data/processed/*/
+data_engineering/data/cache/*/
+!data_engineering/data/*/.gitkeep
+!data_engineering/data/raw/README.md
+!data_engineering/data/processed/README.md
+
+# Analysis results (timestamped files)
+data_engineering/data/analysis/**/
+!data_engineering/data/analysis/README.md
+
+# Reports (keep structure, ignore timestamped files)
+data_engineering/data/reports/**/*.json
+data_engineering/data/reports/**/*.md
+!data_engineering/data/reports/README.md
+!data_engineering/data/reports/*/README.md
+
+# Backups
+*_backup_*/
+architecture_migration_backup_*/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+data_engineering/notebooks/*.ipynb
+
+# Logs
+logs/
+*.log
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+tmp/
+temp/
+
+# Old code : to delete
+old_thinking/
+
+# Tools
+tools/zbar_install/
+
+# Migration files (temporary)
+data_engineering/data/reports/MIGRATION_*.md
+data_engineering/data/reports/MAKEFILE_UPDATES.md
+
+# Original French README (kept for reference)
+readmeforme.md
+
