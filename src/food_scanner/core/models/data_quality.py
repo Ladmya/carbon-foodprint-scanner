@@ -18,7 +18,7 @@ from enum import Enum
 
 
 class FieldType(Enum):
-    """Types de champs analysés"""
+    """Types of fields analyzed"""
     IDENTIFIER = "identifier"        # barcode
     TEXT = "text"                   # product_name, brand_name
     LIST = "list"                   # brand_tags
@@ -29,19 +29,19 @@ class FieldType(Enum):
 
 
 class ValidationRule(Enum):
-    """Règles de validation disponibles"""
-    REQUIRED = "required"           # Champ obligatoire
-    OPTIONAL = "optional"           # Champ facultatif
-    REJECT_IF_MISSING = "reject_if_missing"  # Rejeter produit si manquant
-    FALLBACK_CHAIN = "fallback_chain"        # Chaîne de fallback
-    FORMAT_VALIDATION = "format_validation"  # Validation de format
-    RANGE_VALIDATION = "range_validation"    # Validation de plage
-    ENUMERATION = "enumeration"              # Valeurs autorisées
+    """Validation rules available"""
+    REQUIRED = "required"           # Required field
+    OPTIONAL = "optional"           # Optional field
+    REJECT_IF_MISSING = "reject_if_missing"  # Reject product if missing
+    FALLBACK_CHAIN = "fallback_chain"        # Fallback chain
+    FORMAT_VALIDATION = "format_validation"  # Format validation
+    RANGE_VALIDATION = "range_validation"    # Range validation
+    ENUMERATION = "enumeration"              # Enumeration
 
 
 @dataclass
 class FieldValidationRule:
-    """Règle de validation pour un champ spécifique"""
+    """Validation rule for a specific field"""
     field_name: str
     field_type: FieldType
     validation_type: ValidationRule
@@ -56,57 +56,57 @@ class FieldValidationRule:
 
 @dataclass
 class FieldAnalysisResult:
-    """Résultat d'analyse pour un champ"""
+    """Analysis result for a field"""
     field_name: str
     field_type: FieldType
     total_products: int
     
-    # Statistiques de présence
+    # Presence statistics
     present_count: int = 0
     missing_count: int = 0
     empty_count: int = 0
     invalid_count: int = 0
     
-    # Statistiques de qualité
+    # Quality statistics
     valid_count: int = 0
     fallback_used_count: int = 0
     transformation_success_count: int = 0
     
-    # Métriques calculées
+    # Calculated metrics
     presence_rate: float = 0.0
     validity_rate: float = 0.0
     quality_score: float = 0.0
     
-    # Détails spécifiques au type de champ
+    # Specific details for field type
     value_distribution: Dict[str, int] = field(default_factory=dict)
     pattern_analysis: Dict[str, Any] = field(default_factory=dict)
     examples: Dict[str, List[Dict]] = field(default_factory=dict)
     
-    # Recommandations
+    # Recommendations
     transformation_recommendations: List[str] = field(default_factory=list)
     quality_improvement_suggestions: List[str] = field(default_factory=list)
 
 
 @dataclass
 class ComprehensiveAnalysisReport:
-    """Rapport d'analyse complète de tous les champs"""
+    """Complete analysis report for all fields"""
     analysis_timestamp: str
     dataset_info: Dict[str, Any]
     
-    # Résultats par champ
+    # Field results
     field_results: Dict[str, FieldAnalysisResult] = field(default_factory=dict)
     
-    # Statistiques globales
+    # Global statistics
     total_products_analyzed: int = 0
     overall_quality_score: float = 0.0
     
-    # Analyse de rejet
+    # Rejection analysis
     rejection_analysis: Dict[str, Any] = field(default_factory=dict)
     
-    # Règles générées
+    # Generated rules
     generated_transformation_rules: Dict[str, Any] = field(default_factory=dict)
     
-    # Recommandations
+    # Recommendations
     critical_issues: List[str] = field(default_factory=list)
     improvement_priorities: List[str] = field(default_factory=list)
 
@@ -114,7 +114,7 @@ class ComprehensiveAnalysisReport:
 @dataclass
 class RawProductData:
     """Raw data as extracted from OpenFoodFacts API"""
-    barcode: str  # IMPORTANT: String pour préserver zéros de début
+    barcode: str  # IMPORTANT: String to preserve leading zeros
     extraction_timestamp: str
     source_api: str
     raw_response: Dict[str, Any]
@@ -133,7 +133,7 @@ class RawProductData:
 @dataclass
 class TransformedProductData:
     """Clean, validated, business-ready data for single table (fast loading)"""
-    barcode: str  # String primary key - préserve zéros de début
+    barcode: str  # String primary key - preserve leading zeros
     product_name: str
     brand_name: str
     brand_tags: Optional[List[str]]
@@ -144,7 +144,7 @@ class TransformedProductData:
     eco_score: Optional[str]
     co2_total: Optional[float]
     
-    # Calculated fields pour bot (fast loading)
+    # Calculated fields for bot (fast loading)
     co2_vehicle_km: Optional[float] = None
     co2_train_km: Optional[float] = None
     co2_bus_km: Optional[float] = None
@@ -174,11 +174,11 @@ class TransformedProductData:
 
 # Utility functions for timestamping
 def generate_timestamp_suffix() -> str:
-    """Générer suffixe timestamp pour fichiers JSON"""
+    """Generate timestamp suffix for JSON files"""
     return datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
 def generate_analysis_filename(prefix: str, extension: str = "json") -> str:
-    """Générer nom de fichier avec timestamp pour analyses"""
+    """Generate filename with timestamp for analysis"""
     timestamp = generate_timestamp_suffix()
     return f"{prefix}_{timestamp}.{extension}"

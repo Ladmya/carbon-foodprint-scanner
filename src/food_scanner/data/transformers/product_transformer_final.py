@@ -323,7 +323,15 @@ class  ProductTransformer:
         return cleaned
 
     def _clean_brand_name(self, brand_name: str, barcode: str) -> str:
-        """Clean and normalize brand name using BrandNameCleaner"""
+        """Clean and normalize brand name using BrandNameCleaner
+        Add stats to track cleaning and normalization
+        Args:
+            brand_name: Raw brand name
+            barcode: Product barcode
+            
+        Returns:
+            Cleaned brand name
+        """
         if not brand_name:
             return ""
     
