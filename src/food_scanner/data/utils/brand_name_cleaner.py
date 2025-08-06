@@ -178,16 +178,37 @@ class BrandNameCleaner:
         # Fix spacing around commas
         cleaned = re.sub(r'\s*,\s*', ',', cleaned)
         
-        # Remove quotes and problematic special characters
-        cleaned = re.sub(r'["\']', '', cleaned)
+        # Remove quotes but preserve apostrophes in brand names
+        cleaned = re.sub(r'["]', '', cleaned)  # Remove only double quotes
         
         # Remove non-Latin characters (Thai, etc.) but keep basic punctuation
         cleaned = re.sub(r'[^\w\s\',&!.-]', '', cleaned, flags=re.UNICODE)
         
         # Clean up trailing punctuation and empty spaces
         cleaned = re.sub(r'[,\s]+', ' ', cleaned)
+        
+        # Remove consecutive duplicate words (case-insensitive)
+        cleaned = self._remove_duplicate_words(cleaned)
 
         return cleaned
+    
+    def _remove_duplicate_words(self, text: str) -> str:
+        """Remove consecutive duplicate words (case-insensitive)"""
+        if not text:
+            return text
+        
+        words = text.split()
+        if len(words) <= 1:
+            return text
+        
+        # Remove consecutive duplicates (case-insensitive)
+        cleaned_words = []
+        for i, word in enumerate(words):
+            # Skip if this word is the same as the previous one (case-insensitive)
+            if i == 0 or word.lower() != words[i-1].lower():
+                cleaned_words.append(word)
+        
+        return ' '.join(cleaned_words)
     
     def _extract_primary_brand(self, brand: str) -> str:
         """Extract primary brand from multi-brand string"""
@@ -553,22 +574,6 @@ class BrandNameCleaner:
             "cleaning_stats": self.get_cleaning_stats()
         }
 
-
-def clean_single_brand(brand_name: str) -> str:
-    """
-    Convenience function to clean a single brand name
-    
-    Args:
-        brand_name: Raw brand name
-        
-    Returns:
-        Cleaned brand name
-    """
-    cleaner = BrandNameCleaner()
-    cleaned, _ = cleaner.clean_brand_name(brand_name)
-    return cleaned
-
-
 def analyze_brand_variations(brands: List[str]) -> Dict[str, any]:
     """
     Analyze brand variations in a dataset
@@ -596,11 +601,42 @@ def analyze_brand_variations(brands: List[str]) -> Dict[str, any]:
         if len(originals) > 1
     }
     
+    # Deduplicate results based on first word
+    unique_cleaned_brands = _deduplicate_by_first_word(result["unique_cleaned_brands"])
+    
     result["brand_groups"] = brand_groups
     result["problematic_brands"] = problematic_brands
-    result["consolidation_ratio"] = round(len(result["unique_cleaned_brands"]) / max(1, result["unique_originals"]), 2)
+    result["unique_cleaned_brands"] = unique_cleaned_brands
+    result["cleaned_count"] = len(unique_cleaned_brands)
+    result["consolidation_ratio"] = round(len(unique_cleaned_brands) / max(1, result["unique_originals"]), 2)
     
     return result
+
+
+def _deduplicate_by_first_word(brands: List[str]) -> List[str]:
+    """Deduplicate brands based on first word (keep the shortest)"""
+    if not brands:
+        return brands
+    
+    # Group brands by their first word
+    first_word_groups = {}
+    for brand in brands:
+        first_word = brand.split()[0].lower() if brand.split() else ""
+        if first_word not in first_word_groups:
+            first_word_groups[first_word] = []
+        first_word_groups[first_word].append(brand)
+    
+    # For each group, keep the shortest brand (most specific)
+    deduplicated = []
+    for first_word, brand_list in first_word_groups.items():
+        if len(brand_list) == 1:
+            deduplicated.append(brand_list[0])
+        else:
+            # Keep the shortest brand (most specific)
+            shortest_brand = min(brand_list, key=len)
+            deduplicated.append(shortest_brand)
+    
+    return sorted(deduplicated)
 
 
 if __name__ == "__main__":
@@ -699,280 +735,3 @@ if __name__ == "__main__":
     
     print(f"   🚀 Channel message will be much cleaner!")
     print("=" * 60)
-
-    
-    def _extract_primary_brand(self, brand: str) -> str:
-        """Extract primary brand from multi-brand string"""
-        # Split on comma to handle "Brand1,Brand2,Brand3" format
-        parts = [part.strip() for part in brand.split(',')]
-        
-        if len(parts) == 1:
-            return parts[0]
-        
-        # Find the primary brand (not a parent company)
-        for part in parts:
-            part_lower = part.lower().strip()
-            
-            # Skip if it's a known parent company
-            if part_lower in self.parent_companies:
-                continue
-            
-            # Skip if it's too generic or looks like a category
-            if len(part) < 3 or part_lower in ['chocolate', 'chocolat', 'food', 'foods']:
-                continue
-            
-            # This looks like a primary brand
-            return part
-        
-        # Fallback: return first part if no primary brand identified
-        return parts[0]
-    
-    def _normalize_case_and_accents(self, brand: str) -> str:
-        """Normalize case and handle accent variations"""
-        if not brand:
-            return ""
-        
-        # Convert to lowercase for comparison
-        brand_lower = brand.lower()
-        
-        # Handle specific accent normalizations for chocolate brands
-        accent_normalizations = {
-            # Côte d'Or variations
-            "cote d'or": "Côte d'Or",
-            "cote d or": "Côte d'Or",
-            "côte d'or": "Côte d'Or", 
-            "côte d or": "Côte d'Or",
-            "côté d'or": "Côte d'Or",  # Common typo
-            "côté d or": "Côte d'Or",
-            
-            # Other brands that might have accent issues
-            "nestle": "Nestlé",
-            "nestlé": "Nestlé"
-        }
-        
-        if brand_lower in accent_normalizations:
-            self.cleaning_stats["accents_normalized"] += 1
-            return accent_normalizations[brand_lower]
-        
-        # Default: Title case with proper handling of apostrophes
-        words = brand.split()
-        normalized_words = []
-        
-        for word in words:
-            # Handle words with apostrophes properly
-            if "'" in word:
-                # Split on apostrophe and capitalize each part
-                apostrophe_parts = word.split("'")
-                capitalized_parts = [part.capitalize() for part in apostrophe_parts]
-                normalized_words.append("'".join(capitalized_parts))
-            else:
-                normalized_words.append(word.capitalize())
-        
-        return " ".join(normalized_words)
-    
-    def _map_to_canonical(self, brand: str) -> str:
-        """Map brand to canonical form if known"""
-        brand_lower = brand.lower().strip()
-        
-        # Direct mapping
-        if brand_lower in self.brand_mappings:
-            return self.brand_mappings[brand_lower]
-        
-        # Fuzzy matching for slight variations
-        for known_variation, canonical in self.brand_mappings.items():
-            # Remove spaces and compare
-            if brand_lower.replace(" ", "") == known_variation.replace(" ", ""):
-                return canonical
-            
-            # Handle slight typos (single character difference)
-            if len(brand_lower) == len(known_variation):
-                differences = sum(1 for a, b in zip(brand_lower, known_variation) if a != b)
-                if differences == 1:
-                    return canonical
-        
-        # No mapping found, return as-is
-        return brand
-    
-    def _final_validation(self, brand: str) -> str:
-        """Final validation and cleanup"""
-        if not brand:
-            return ""
-        
-        # Ensure reasonable length
-        if len(brand) > 50:
-            # Try to extract a reasonable brand name
-            words = brand.split()
-            if len(words) > 1:
-                # Take first 2-3 words
-                brand = " ".join(words[:3])
-            else:
-                # Truncate long single word
-                brand = brand[:47] + "..."
-        
-        # Remove trailing punctuation
-        brand = brand.rstrip('.,;:')
-        
-        return brand.strip()
-    
-    def get_cleaning_stats(self) -> Dict[str, any]:
-        """Get cleaning statistics"""
-        total_processed = self.cleaning_stats["brands_processed"]
-        
-        stats = self.cleaning_stats.copy()
-        if total_processed > 0:
-            stats["cleaning_rate"] = round((stats["brands_cleaned"] / total_processed) * 100, 1)
-        else:
-            stats["cleaning_rate"] = 0.0
-        
-        return stats
-    
-    def clean_brand_list(self, brands: List[str]) -> Dict[str, any]:
-        """
-        Clean a list of brands and return summary
-        
-        Args:
-            brands: List of raw brand names
-            
-        Returns:
-            Dict with cleaned brands and statistics
-        """
-        cleaned_brands = {}
-        cleaning_log = []
-        
-        for raw_brand in brands:
-            cleaned_brand, details = self.clean_brand_name(raw_brand)
-            
-            if cleaned_brand:
-                cleaned_brands[raw_brand] = cleaned_brand
-                
-                # Log significant changes
-                if cleaned_brand != raw_brand:
-                    cleaning_log.append({
-                        "original": raw_brand,
-                        "cleaned": cleaned_brand,
-                        "details": details
-                    })
-        
-        # Get unique cleaned brands
-        unique_cleaned = list(set(cleaned_brands.values()))
-        unique_cleaned.sort()
-        
-        return {
-            "original_count": len(brands),
-            "unique_originals": len(set(brands)),
-            "cleaned_count": len(unique_cleaned),
-            "unique_cleaned_brands": unique_cleaned,
-            "cleaning_log": cleaning_log,
-            "cleaning_stats": self.get_cleaning_stats()
-        }
-
-
-def clean_single_brand(brand_name: str) -> str:
-    """
-    Convenience function to clean a single brand name
-    
-    Args:
-        brand_name: Raw brand name
-        
-    Returns:
-        Cleaned brand name
-    """
-    cleaner = BrandNameCleaner()
-    cleaned, _ = cleaner.clean_brand_name(brand_name)
-    return cleaned
-
-
-def analyze_brand_variations(brands: List[str]) -> Dict[str, any]:
-    """
-    Analyze brand variations in a dataset
-    
-    Args:
-        brands: List of brand names to analyze
-        
-    Returns:
-        Analysis results with groupings and statistics
-    """
-    cleaner = BrandNameCleaner()
-    result = cleaner.clean_brand_list(brands)
-    
-    # Group original brands by their cleaned version
-    brand_groups = {}
-    for original, cleaned in result.get("cleaned_brands", {}).items():
-        if cleaned not in brand_groups:
-            brand_groups[cleaned] = []
-        brand_groups[cleaned].append(original)
-    
-    # Find brands with multiple variations
-    problematic_brands = {
-        cleaned: originals 
-        for cleaned, originals in brand_groups.items() 
-        if len(originals) > 1
-    }
-    
-    result["brand_groups"] = brand_groups
-    result["problematic_brands"] = problematic_brands
-    result["consolidation_ratio"] = round(len(result["unique_cleaned_brands"]) / max(1, result["unique_originals"]), 2)
-    
-    return result
-
-
-if __name__ == "__main__":
-    print("🧹 BRAND NAME CLEANER - Testing")
-    print("=" * 50)
-    
-    # Test with the problematic brands from the user
-    test_brands = [
-        "Bounty",
-        "Bounty, Mars", 
-        "Bounty,Mars",
-        "Bounty,Mars,Mars Chocolat",
-        "Cote d'Or",
-        "Cote d'or", 
-        "CÔTE D'OR",
-        "Côte D'Or",
-        "Côte D'or",
-        "Côte D'Or,Mondelez",
-        "Côte d'Or",
-        "Côte d'Or,Fraft Foods",
-        "Côte d'Or,Kraft Foods", 
-        "Côte d'Or,Mondelez",
-        "Côte d'Or,Mondelez International",
-        "Côte d'Or,Mondelez,Mondelez International",
-        "Côte d'Or,Mondelèz International",
-        "Côte d'Or,Mondelēz",
-        "Côte d'or",
-        "Côte d'or,Kraft Foods",
-        "Côte d'or,Mondelez", 
-        "Côte d'or",
-        "Côte d'or,Mondelez",
-        "Côté d'Or",
-        "Côté d'Or,Mondelez",
-        "Côté d'or",
-        "FERRERO ROCHER"
-    ]
-    
-    # Test cleaning
-    analysis = analyze_brand_variations(test_brands)
-    
-    print(f"📊 ANALYSIS RESULTS:")
-    print(f"   → Original brands: {analysis['original_count']}")
-    print(f"   → Unique originals: {analysis['unique_originals']}")
-    print(f"   → Cleaned brands: {analysis['cleaned_count']}")
-    print(f"   → Consolidation ratio: {analysis['consolidation_ratio']}")
-    
-    print(f"\n✅ CLEANED BRAND LIST:")
-    for brand in analysis['unique_cleaned_brands']:
-        print(f"   • {brand}")
-    
-    print(f"\n🔧 PROBLEMATIC BRANDS CONSOLIDATED:")
-    for cleaned, originals in analysis['problematic_brands'].items():
-        print(f"   {cleaned}:")
-        for original in originals[:5]:  # Show first 5
-            print(f"      ← {original}")
-        if len(originals) > 5:
-            print(f"      ← ... and {len(originals) - 5} more")
-    
-    print(f"\n📈 CLEANING STATISTICS:")
-    stats = analysis['cleaning_stats']
-    for key, value in stats.items():
-        print(f"   → {key}: {value}")
