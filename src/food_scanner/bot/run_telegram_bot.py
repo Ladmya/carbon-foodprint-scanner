@@ -3,7 +3,6 @@ carbon_foodprint/src/food_scanner/bot/run_telegram_bot.py
 Launch script for Carbon Foodprint Scanner Telegram Bot
 """
 
-import os
 import sys
 import logging
 from logging.handlers import RotatingFileHandler

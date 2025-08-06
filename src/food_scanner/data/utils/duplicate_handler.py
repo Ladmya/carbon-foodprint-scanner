@@ -7,7 +7,7 @@ import json
 import hashlib
 from pathlib import Path
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Set, Tuple, Optional
+from typing import Dict, Any
 
 
 class DuplicateHandler:

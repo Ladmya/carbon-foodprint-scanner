@@ -3,7 +3,6 @@ src/food_scanner/infrastructure/external_apis/base_client.py
 Abstract base class for external API clients.
 """
 
-import os
 import sys
 from abc import ABC, abstractmethod
 from datetime import datetime
@@ -12,6 +11,7 @@ import httpx
 from httpx import AsyncClient
 
 from ...core.constants import RATE_LIMITS
+from ...core.config import db_environment, use_test_api, test_environment, pytest_environment
 
 
 class BaseAPIClient(ABC):
@@ -37,17 +37,15 @@ class BaseAPIClient(ABC):
     def _auto_detect_environment(self) -> bool:
         """Auto-detect if we should use test environment."""
         # 1. Check USE_TEST_API environment variable (highest priority) 
-        use_test_api = os.getenv("USE_TEST_API", "").lower()
-        if use_test_api == "true":
+        if use_test_api.lower() == "true":
             return True
-        elif use_test_api == "false":
+        elif use_test_api.lower() == "false":
             return False
             
         # 2. Check DB_ENVIRONMENT 
-        db_environment = os.getenv("DB_ENVIRONMENT", "").lower()
-        if db_environment == "test":
+        if db_environment.lower() == "test":
             return True
-        elif db_environment == "production":
+        elif db_environment.lower() == "production":
             return False
             
         # 3. Check if running in pytest context
@@ -61,9 +59,9 @@ class BaseAPIClient(ABC):
         """Detect if we're running in a test context."""
         return (
             "pytest" in sys.modules or
-            "PYTEST_CURRENT_TEST" in os.environ or
-            os.environ.get("TESTING", "").lower() == "true" or
-            os.environ.get("USE_TEST_API", "").lower() == "true"
+            pytest_environment or
+            test_environment.lower() == "true" or
+            use_test_api.lower() == "true"
         )
     
     @property

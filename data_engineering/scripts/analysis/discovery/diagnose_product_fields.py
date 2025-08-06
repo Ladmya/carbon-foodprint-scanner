@@ -5,10 +5,8 @@ Diagnostic script to understand why products are being rejected
 """
 
 import asyncio
-import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Any
 
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "src"))

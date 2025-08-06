@@ -1,6 +1,5 @@
 # src/food_scanner/infrastructure/database/repositories/supabase_client.py
 
-import os
 from supabase import create_client, Client
 
 from food_scanner.core.config import (

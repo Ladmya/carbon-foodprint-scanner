@@ -6,7 +6,6 @@ Combines discovery, enrichment, and field parsing in one class
 
 import asyncio
 import sys
-import traceback as tr
 from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple
 from pathlib import Path

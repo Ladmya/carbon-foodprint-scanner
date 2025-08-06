@@ -3,7 +3,7 @@ src/food_scanner/data/analysis/base_analyzer.py
 Base class for all field analyzers with common functionality
 """
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Dict, List, Any
 from food_scanner.core.models.data_quality import FieldAnalysisResult
 

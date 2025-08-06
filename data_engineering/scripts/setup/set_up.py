@@ -3,7 +3,6 @@ Setup Script - Carbon Foodprint Scanner Architecture
 Data engineering structure creation + old files migration 
 """
 
-import os
 import shutil
 import json
 from pathlib import Path

@@ -6,7 +6,6 @@ This module provides real-time monitoring of the loading process with
 progress bars, ETA calculations, and performance metrics.
 """
 
-import time
 from datetime import datetime, timedelta
 from typing import Dict, Any
 

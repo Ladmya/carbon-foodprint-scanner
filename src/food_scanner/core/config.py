@@ -35,6 +35,10 @@ use_test_api: str = os.getenv('USE_TEST_API', 'false')
 openfoodfacts_api_key: str = os.getenv('OPENFOODFACTS_API_KEY', '')
 openfoodfacts_user_agent: str = os.getenv('OPENFOODFACTS_USER_AGENT', 'FoodprintBot/1.0')
 
+# Testing environment
+test_environment: str = os.getenv('TESTING', 'false')
+pytest_environment: str = os.getenv('PYTEST_CURRENT_TEST', '')
+
 # Rate limiting overrides (optionnel)
 rate_limit_product: str = os.getenv('RATE_LIMIT_PRODUCT', '')
 rate_limit_search: str = os.getenv('RATE_LIMIT_SEARCH', '')

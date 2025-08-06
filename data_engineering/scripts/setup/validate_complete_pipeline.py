@@ -8,7 +8,7 @@ import sys
 import json
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "src"))
