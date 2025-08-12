@@ -110,7 +110,7 @@ class ComprehensiveAnalysisReport:
     critical_issues: List[str] = field(default_factory=list)
     improvement_priorities: List[str] = field(default_factory=list)
 
-
+# TODO: to use 
 @dataclass
 class RawProductData:
     """Raw data as extracted from OpenFoodFacts API"""
@@ -129,7 +129,7 @@ class RawProductData:
             'api_status': self.api_status
         }
 
-
+# TODO: to use 
 @dataclass
 class TransformedProductData:
     """Clean, validated, business-ready data for single table (fast loading)"""
