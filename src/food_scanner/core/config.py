@@ -1,3 +1,6 @@
+"""
+src/food_scanner/core/config.py
+"""
 
 import os
 from dotenv import load_dotenv

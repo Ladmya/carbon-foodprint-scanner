@@ -1,4 +1,5 @@
 """
+src/food_scanner/core/constants.py
 Constants used throughout the application.
 """
 
