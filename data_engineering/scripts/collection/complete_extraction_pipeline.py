@@ -38,7 +38,7 @@ class CompleteExtractionPipeline:
     5. Provide executive summary for decision making
     """
     
-    def __init__(self, use_test_env: bool = True, target_products: int = 3000):
+    def __init__(self, use_test_env: bool = True, target_products: int = 100):
         self.use_test_env = use_test_env
         self.target_products = target_products
         self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -137,10 +137,10 @@ class CompleteExtractionPipeline:
 
         # Use all brands and categories for testing
         if brands is None:
-            brands = MAJOR_CHOCOLATE_BRANDS_FRANCE
+            brands = MAJOR_CHOCOLATE_BRANDS_FRANCE[:5]
             print(f"   📦 Using all {len(brands)} major chocolate brands")
         if categories is None:
-            categories = CHOCOLATE_CATEGORIES
+            categories = CHOCOLATE_CATEGORIES[:5]
 
         
         print(f"   📦 Using {len(brands)} brands: {', '.join(brands)}")
@@ -197,7 +197,7 @@ class CompleteExtractionPipeline:
         print(f"   📊 Calculating derived fields")
         
         # Initialize transformer with duplicate handling
-        transformer = ProductTransformer(use_duplicate_handling=True)
+        transformer = ProductTransformer(use_duplicate_handling=False)
         
         # Run transformation
         transformation_results = transformer.transform_extracted_products(
@@ -560,7 +560,7 @@ async def main():
     
     # Configuration
     USE_TEST_ENV = True  # Set to False for production API
-    TARGET_PRODUCTS = 3000 # Target number of products
+    TARGET_PRODUCTS = 100 # Target number of products
     
     # Initialize pipeline
     pipeline = CompleteExtractionPipeline(

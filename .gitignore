@@ -39,6 +39,9 @@ data_engineering/data/cache/*/
 !data_engineering/data/raw/README.md
 !data_engineering/data/processed/README.md
 
+# Source data files
+src/data/
+
 # Analysis results (timestamped files)
 data_engineering/data/analysis/**/
 !data_engineering/data/analysis/README.md
@@ -48,6 +51,8 @@ data_engineering/data/reports/**/*.json
 data_engineering/data/reports/**/*.md
 !data_engineering/data/reports/README.md
 !data_engineering/data/reports/*/README.md
+
+
 
 # Backups
 *_backup_*/
