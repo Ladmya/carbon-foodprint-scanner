@@ -195,12 +195,12 @@ class LoadingMonitor:
         # Calculate coefficient of variation for batch times
         mean_time = sum(self.batch_times) / len(self.batch_times)
         variance = sum((t - mean_time) ** 2 for t in self.batch_times) / len(self.batch_times)
-        std_dev = variance ** 0.5
+        standard_deviation = variance ** 0.5
         
         if mean_time == 0:
             return 100.0
         
-        coefficient_of_variation = std_dev / mean_time
+        coefficient_of_variation = standard_deviation / mean_time
         
         # Convert to consistency score (lower variation = higher score)
         consistency_score = max(0, 100 - (coefficient_of_variation * 100))
