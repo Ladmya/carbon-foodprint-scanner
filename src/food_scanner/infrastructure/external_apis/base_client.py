@@ -4,6 +4,7 @@ Abstract base class for external API clients.
 """
 
 import sys
+import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Optional, Dict, Any
@@ -13,9 +14,15 @@ from httpx import AsyncClient
 from ...core.constants import RATE_LIMITS
 from ...core.config import db_environment, use_test_api, test_environment, pytest_environment
 
+logger = logging.getLogger(__name__)
+
 
 class BaseAPIClient(ABC):
-    """Abstract base class for external API clients with common functionality."""
+    """Abstract base class for external API clients with common functionality.
+    Define rate limits for each API call type.
+    Detects which environment we are in (test or production)
+    Handles url calls to the API with error handling
+    """
     
     def __init__(self, use_test_env: Optional[bool] = None):
         """
@@ -161,6 +168,7 @@ class BaseAPIClient(ABC):
             time_since_last = (now - self._last_requests[request_type]).total_seconds()
             if time_since_last < rate_limit:
                 sleep_time = rate_limit - time_since_last
+                logger.debug(f"Rate limiting: sleeping {sleep_time:.1f}s for {request_type} request")
                 await asyncio.sleep(sleep_time)
         
         self._last_requests[request_type] = datetime.now()

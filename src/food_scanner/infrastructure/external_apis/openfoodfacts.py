@@ -1,11 +1,11 @@
 """
-src/food_scanner/infrastructure/external_apis/oopenfoodfacts.py
+src/food_scanner/infrastructure/external_apis/openfoodfacts.py
 OpenFoodFacts API client for retrieving product data.
 """
 
 import os
+import base64
 import logging
-from datetime import datetime
 from typing import Dict, List, Optional, Any
 import httpx
 from httpx import HTTPStatusError, RequestError
@@ -13,19 +13,22 @@ from httpx import HTTPStatusError, RequestError
 from .base_client import BaseAPIClient
 from ...core.constants import (
     OPENFOODFACTS_CONFIG,  # Public constants (URLs, defaults)
-    CHOCOLATE_CATEGORIES,
     OPENFOODFACTS_FIELDS,
     PAGINATION_DEFAULTS,
-    RATE_LIMITS
 )
+from ...core.config import (
+    openfoodfacts_api_key,
+)
+
+# Rate limits are defined in constants.py
 
 logger = logging.getLogger(__name__)
 
 
 class OpenFoodFactsClient(BaseAPIClient):
     """
-    Async client for OpenFoodFacts API with rate limiting and error handling.
-
+    Async client for OpenFoodFacts API with rate limiting and error handling through base_client.py
+    Added Basic Authentication for staging environment to resolve 403 errors
     Rate limits (per OpenFoodFacts documentation):
     - Product queries: 100 req/min 
     - Search queries: 10 req/min
@@ -66,49 +69,20 @@ class OpenFoodFactsClient(BaseAPIClient):
             "Accept-Language": "en",
         }
         
+        # FIX: Add Basic Auth for staging environment (username: off, password: off)
+        if self.use_test_env:
+            auth_string = base64.b64encode(b"off:off").decode('ascii')
+            headers["Authorization"] = f"Basic {auth_string}"
+            logger.debug(f"Added Basic Auth for staging environment: {auth_string}")
+
         # Add API key if configured
-        api_key = os.getenv("OPENFOODFACTS_API_KEY")
-        if api_key:
-            headers["Authorization"] = f"Bearer {api_key}"
-            
+        if openfoodfacts_api_key and not self.use_test_env:
+            headers["Authorization"] = f"Bearer {openfoodfacts_api_key}"
+        
+        logger.debug(f"Headers for use_test_env={self.use_test_env}: {headers}")
         return headers
 
-    def _get_rate_limit(self, request_type: str) -> float:
-        """Get rate limit with environment variable override."""
-        # Check for environment overrides first
-        if request_type == "product":
-            override = os.getenv("RATE_LIMIT_PRODUCT")
-            if override:
-                try:
-                    return float(override)
-                except ValueError:
-                    pass
-        elif request_type == "search":
-            override = os.getenv("RATE_LIMIT_SEARCH")
-            if override:
-                try:
-                    return float(override)
-                except ValueError:
-                    pass
-        
-        # Fall back to constants
-        return RATE_LIMITS.get(request_type, 1.0)
-
-    async def _apply_rate_limit(self, request_type: str):
-        """Apply rate limiting with configurable limits."""
-        import asyncio
-        
-        rate_limit = self._get_rate_limit(request_type)
-        now = datetime.now()
-        
-        if request_type in self._last_requests:
-            time_since_last = (now - self._last_requests[request_type]).total_seconds()
-            if time_since_last < rate_limit:
-                sleep_time = rate_limit - time_since_last
-                logger.debug(f"Rate limiting: sleeping {sleep_time:.1f}s for {request_type} request")
-                await asyncio.sleep(sleep_time)
-        
-        self._last_requests[request_type] = now
+    # Use rate limiting from base_client.py - no need to override
 
     async def get_product(
         self,
@@ -174,8 +148,11 @@ class OpenFoodFactsClient(BaseAPIClient):
                 response.raise_for_status()
 
         except HTTPStatusError as e:
-            logger.error(f"HTTP error for barcode {clean_barcode}: {e.response.status_code}")
-            raise
+            if e.response.status_code == 403:
+                logger.error(f"403 Forbidden for barcode {clean_barcode}. Check authentication for test environment.")
+            else:            
+                logger.error(f"HTTP error for barcode {clean_barcode}: {e.response.status_code}")
+                raise
         except RequestError as e:
             logger.error(f"Request error for barcode {clean_barcode}: {str(e)}")
             raise
@@ -237,6 +214,10 @@ class OpenFoodFactsClient(BaseAPIClient):
         category_info = categories[0] if categories and len(categories) > 0 else "no-filter"
         env_name = "TEST" if use_test_env else "PROD"
         logger.info(f"Searching products: brand={brand}, category={category_info}, page={page} ({env_name})")
+        
+        # DEBUG: Log current headers being used
+        current_headers = self.headers
+        logger.debug(f"Request headers: {current_headers}")
 
         try:
             response = await self._make_request("GET", url, params=params)
@@ -260,8 +241,11 @@ class OpenFoodFactsClient(BaseAPIClient):
                 response.raise_for_status()
 
         except HTTPStatusError as e:
-            logger.error(f"HTTP error for search {brand}: {e.response.status_code}")
-            raise
+            if e.response.status_code == 403:
+                logger.error(f"403 Forbidden for search {brand}. Staging environment requires Basic Auth (off:off)")
+            else:
+                logger.error(f"HTTP error for search {brand}: {e.response.status_code}")
+                raise
         except RequestError as e:
             logger.error(f"Request error for search {brand}: {str(e)}")
             raise
